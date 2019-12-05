@@ -1,0 +1,56 @@
+version: "3"
+
+services:
+  database:
+    image: mysql:5
+    container_name: example-db 
+    # volumes:
+    #   - database_vol:/var/lib/mysql/data
+
+    environment: 
+      MYSQL_USER: user 
+      MYSQL_PASSWORD: user
+      MYSQL_ROOT_PASSWORD: example
+      MYSQL_DATABASE: example
+
+  helloword:
+    image: normanno/helloword-example
+    container_name: hello-app
+    ports:
+      - 8080:8080
+    environment:   
+      db_host: database
+      db_username: root
+      db_pass: example
+      db_database: example
+      db_port: 3306
+    links:
+      - database
+    depends_on: 
+      - database
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    restart: always
+    links: 
+      - database
+    environment: 
+      PMA_HOST: database
+      PMA_PORT: 3306
+      MYSQL_USER: user 
+      MYSQL_PASSWORD: user
+      MYSQL_ROOT_PASSWORD: example
+      MYSQL_DATABASE: example
+    depends_on: 
+      - database
+    ports:
+      #- HOST:CONTAINER
+      - 8081:80
+      - 8443:443
+
+# volumes:
+#   database_vol:
+#     driver_opts:
+#       type: none
+#       device: /home/<path-to-destination>/data
+#       o: bind
